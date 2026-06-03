@@ -1,4 +1,4 @@
-# MewUI.X
+# MewUI.Controls
 
 Extension controls and higher-level interaction surfaces for
 [MewUI](https://github.com/IoTSharp/MewUI).

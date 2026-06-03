@@ -6,7 +6,7 @@ using Aprillz.MewUI.Controls;
 using Aprillz.MewUI.Input;
 using Aprillz.MewUI.Rendering;
 
-namespace Aprillz.MewUI.X.Controls;
+namespace IoTSharp.MewUI.Controls;
 
 /// <summary>
 /// Terminal input payload emitted by <see cref="TerminalControl"/>.

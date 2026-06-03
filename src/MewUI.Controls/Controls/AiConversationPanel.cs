@@ -5,7 +5,7 @@ using Aprillz.MewUI.Controls;
 using Aprillz.MewUI.Input;
 using Aprillz.MewUI.Rendering;
 
-namespace Aprillz.MewUI.X.Controls;
+namespace IoTSharp.MewUI.Controls;
 
 public sealed record AiAttachment(string Name, string? Kind = null, string? Path = null, long? SizeBytes = null, string? Id = null);
 

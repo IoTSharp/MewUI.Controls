@@ -1,4 +1,4 @@
-namespace Aprillz.MewUI.X.Controls;
+namespace IoTSharp.MewUI.Controls;
 
 /// <summary>
 /// Cross-platform terminal host contract used by <see cref="TerminalControl"/>.

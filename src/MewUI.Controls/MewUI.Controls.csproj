@@ -1,13 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Aprillz.MewUI.X</AssemblyName>
-    <RootNamespace>Aprillz.MewUI.X</RootNamespace>
-    <PackageId>Aprillz.MewUI.X</PackageId>
+    <AssemblyName>IoTSharp.MewUI.Controls</AssemblyName>
+    <RootNamespace>IoTSharp.MewUI.Controls</RootNamespace>
+    <PackageId>IoTSharp.MewUI.Controls</PackageId>
     <Version>0.1.0</Version>
     <Authors>IoTSharp</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>Extension controls and higher-level interaction surfaces for MewUI.</Description>
+    <PackageProjectUrl>https://github.com/IoTSharp/MewUI.Controls</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/IoTSharp/MewUI.Controls</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>mewui;controls;terminal;vnc;ai</PackageTags>
+    <Description>Third-party controls and higher-level interaction surfaces for MewUI.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' and Exists('..\..\..\MewUI\src\MewUI\MewUI.csproj')">
