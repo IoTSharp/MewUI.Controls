@@ -11,8 +11,15 @@
     <RepositoryUrl>https://github.com/IoTSharp/MewUI.Controls</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>mewui;controls;terminal;vnc;ai</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Description>Third-party controls and higher-level interaction surfaces for MewUI.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' and Exists('..\..\..\MewUI\src\MewUI\MewUI.csproj')">
     <ProjectReference Include="..\..\..\MewUI\src\MewUI\MewUI.csproj" />

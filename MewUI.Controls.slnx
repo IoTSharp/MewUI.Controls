@@ -1,5 +1,5 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/MewUI.X/MewUI.X.csproj" />
+    <Project Path="src/MewUI.Controls/MewUI.Controls.csproj" />
   </Folder>
 </Solution>
