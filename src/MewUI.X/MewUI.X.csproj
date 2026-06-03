@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Aprillz.MewUI.X</AssemblyName>
+    <RootNamespace>Aprillz.MewUI.X</RootNamespace>
+    <PackageId>Aprillz.MewUI.X</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>IoTSharp</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Extension controls and higher-level interaction surfaces for MewUI.</Description>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0' and Exists('..\..\..\MewUI\src\MewUI\MewUI.csproj')">
+    <ProjectReference Include="..\..\..\MewUI\src\MewUI\MewUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0' or !Exists('..\..\..\MewUI\src\MewUI\MewUI.csproj')">
+    <PackageReference Include="Aprillz.MewUI.Core" Version="0.15.2" />
+  </ItemGroup>
+
+</Project>
