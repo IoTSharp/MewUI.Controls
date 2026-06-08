@@ -295,12 +295,17 @@ public sealed class VncRemoteDesktopControl : Control, ITextInputClient
     protected override void OnMouseWheel(MouseWheelEventArgs e)
     {
         base.OnMouseWheel(e);
+        if (e.Delta.Y == 0)
+        {
+            return;
+        }
+
         if (!TryMapToRemote(GetWindowPosition(e), out var x, out var y))
         {
             return;
         }
 
-        byte wheelMask = e.Delta > 0 ? (byte)8 : (byte)16;
+        byte wheelMask = e.Delta.Y > 0 ? (byte)8 : (byte)16;
         PointerStateChanged?.Invoke(this, new VncPointerEventArgs((byte)(_buttonMask | wheelMask), x, y));
         PointerStateChanged?.Invoke(this, new VncPointerEventArgs(_buttonMask, x, y));
         e.Handled = true;

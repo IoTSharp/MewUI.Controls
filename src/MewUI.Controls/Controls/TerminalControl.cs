@@ -454,7 +454,12 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
     protected override void OnMouseWheel(MouseWheelEventArgs e)
     {
         base.OnMouseWheel(e);
-        int delta = e.Delta > 0 ? -3 : 3;
+        if (e.Delta.Y == 0)
+        {
+            return;
+        }
+
+        int delta = e.Delta.Y > 0 ? -3 : 3;
         if (_screenSource != null)
         {
             _screenSource.SetScrollOffset(_screenSource.ScrollOffset + delta);
@@ -478,7 +483,8 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
 
         if (e.PrimaryKey)
         {
-            if (e.Key == Key.C && GetSelectedText().Length > 0)
+            bool hasSelection = GetSelectedText().Length > 0;
+            if (e.Key == Key.C && hasSelection)
             {
                 CopySelectionToClipboard();
                 e.Handled = true;
@@ -495,6 +501,13 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
             if (e.Key == Key.A)
             {
                 SelectAll();
+                e.Handled = true;
+                return;
+            }
+
+            if (!hasSelection && TryGetControlCharacter(e.Key, out char controlCharacter))
+            {
+                SendInput(controlCharacter.ToString());
                 e.Handled = true;
                 return;
             }
@@ -1165,6 +1178,18 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
             Key.Delete => "\u001b[3~",
             _ => null
         };
+    }
+
+    private static bool TryGetControlCharacter(Key key, out char controlCharacter)
+    {
+        if (key is >= Key.A and <= Key.Z)
+        {
+            controlCharacter = (char)(key - Key.A + 1);
+            return true;
+        }
+
+        controlCharacter = '\0';
+        return false;
     }
 
     private ContextMenu CreateContextMenu()
