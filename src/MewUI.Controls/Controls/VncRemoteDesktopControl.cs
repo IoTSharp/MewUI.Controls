@@ -300,11 +300,7 @@ public sealed class VncRemoteDesktopControl : Control, ITextInputClient
             return;
         }
 
-#if NET10_0_OR_GREATER
-        byte wheelMask = e.Delta.Y > 0 ? (byte)8 : (byte)16;
-#else
         byte wheelMask = e.Delta > 0 ? (byte)8 : (byte)16;
-#endif
         PointerStateChanged?.Invoke(this, new VncPointerEventArgs((byte)(_buttonMask | wheelMask), x, y));
         PointerStateChanged?.Invoke(this, new VncPointerEventArgs(_buttonMask, x, y));
         e.Handled = true;

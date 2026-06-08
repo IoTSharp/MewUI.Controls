@@ -454,11 +454,7 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
     protected override void OnMouseWheel(MouseWheelEventArgs e)
     {
         base.OnMouseWheel(e);
-#if NET10_0_OR_GREATER
-        int delta = e.Delta.Y > 0 ? -3 : 3;
-#else
         int delta = e.Delta > 0 ? -3 : 3;
-#endif
         if (_screenSource != null)
         {
             _screenSource.SetScrollOffset(_screenSource.ScrollOffset + delta);
