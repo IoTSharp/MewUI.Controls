@@ -172,6 +172,14 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
 
     public void Clear()
     {
+        if (_screenSource != null && _host is ITerminalScreenClearer screenClearer)
+        {
+            screenClearer.ClearScreen();
+            ClearSelection();
+            InvalidateVisual();
+            return;
+        }
+
         _screenSource?.SetScrollOffset(0);
         _scrollback.Clear();
         _scrollbackOffset = 0;

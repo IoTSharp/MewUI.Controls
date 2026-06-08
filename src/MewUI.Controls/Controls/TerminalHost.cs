@@ -57,6 +57,14 @@ public interface ITerminalHostCapabilities
     bool IsBracketedPasteModeEnabled { get; }
 }
 
+/// <summary>
+/// Optional host capability for clearing a host-owned terminal buffer.
+/// </summary>
+public interface ITerminalScreenClearer
+{
+    void ClearScreen();
+}
+
 public readonly record struct TerminalHostSize(int Columns, int Rows);
 
 public readonly record struct TerminalScreenCell(string Text, TerminalScreenAttributes Attributes)
