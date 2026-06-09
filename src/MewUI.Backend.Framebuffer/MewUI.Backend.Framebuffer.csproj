@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\MewUI\build\MewUI.Common.props" Condition="Exists('..\..\..\MewUI\build\MewUI.Common.props')" />
+
+  <PropertyGroup Condition="'$(MewUITitle)' == ''">
+    <MewUITitle>Aprillz.MewUI</MewUITitle>
+    <MewUIVersion>0.16.0</MewUIVersion>
+    <MewUIAuthor>Aprillz</MewUIAuthor>
+    <MewUIRootNamespace>Aprillz.MewUI</MewUIRootNamespace>
+    <MewUITargetFrameworks>net8.0;net10.0</MewUITargetFrameworks>
+    <MewUIPackageLicenseExpression>MIT</MewUIPackageLicenseExpression>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFrameworks)' == ''">
+    <TargetFrameworks>$(MewUITargetFrameworks)</TargetFrameworks>
+    <Version>$(MewUIVersion)</Version>
+    <Authors>$(MewUIAuthor)</Authors>
+    <RootNamespace>$(MewUIRootNamespace)</RootNamespace>
+    <PackageLicenseExpression>$(MewUIPackageLicenseExpression)</PackageLicenseExpression>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsTrimmable>true</IsTrimmable>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>$(MewUITitle).Backend.Framebuffer</AssemblyName>
+    <PackageId>$(MewUITitle).Backend.Framebuffer</PackageId>
+    <Description>Linux framebuffer software rendering backend for $(MewUITitle)</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MewUI\src\MewUI\MewUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Common\TextBitmap.cs" LinkBase="Rendering\Common" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\FreeType\**\*.cs" LinkBase="Rendering\FreeType" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Gdi\Sdf\*.cs" LinkBase="Rendering\Gdi\Sdf" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Gdi\Rendering\IEdgeSampler.cs" LinkBase="Rendering\Gdi\Rendering" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Gdi\Rendering\SupersampleEdgeSampler.cs" LinkBase="Rendering\Gdi\Rendering" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Native\Linux\FreeType\**\*.cs" LinkBase="Native\FreeType" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Native\Linux\HarfBuzz\**\*.cs" LinkBase="Native\HarfBuzz" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Native\Linux\Fontconfig\**\*.cs" LinkBase="Native\Fontconfig" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\MewUI\build\MewUI.Common.props" Condition="Exists('..\..\..\MewUI\build\MewUI.Common.props')" />
+
+  <PropertyGroup Condition="'$(MewUITitle)' == ''">
+    <MewUITitle>Aprillz.MewUI</MewUITitle>
+    <MewUIVersion>0.16.0</MewUIVersion>
+    <MewUIAuthor>Aprillz</MewUIAuthor>
+    <MewUIRootNamespace>Aprillz.MewUI</MewUIRootNamespace>
+    <MewUITargetFrameworks>net8.0;net10.0</MewUITargetFrameworks>
+    <MewUIPackageLicenseExpression>MIT</MewUIPackageLicenseExpression>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFrameworks)' == ''">
+    <TargetFrameworks>$(MewUITargetFrameworks)</TargetFrameworks>
+    <Version>$(MewUIVersion)</Version>
+    <Authors>$(MewUIAuthor)</Authors>
+    <RootNamespace>$(MewUIRootNamespace)</RootNamespace>
+    <PackageLicenseExpression>$(MewUIPackageLicenseExpression)</PackageLicenseExpression>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsTrimmable>true</IsTrimmable>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>$(MewUITitle).Platform.Framebuffer</AssemblyName>
+    <PackageId>$(MewUITitle).Platform.Framebuffer</PackageId>
+    <Description>Single-screen Linux framebuffer platform host for $(MewUITitle)</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MewUI\src\MewUI\MewUI.csproj" />
+    <ProjectReference Include="..\MewUI.Backend.Framebuffer\MewUI.Backend.Framebuffer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxDispatcher.cs" LinkBase="Platform\Linux" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxExternalDialogs.cs" LinkBase="Platform\Linux" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxThemeDetector.cs" LinkBase="Platform\Linux" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxGSettingsMonitor.cs" LinkBase="Platform\Linux" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Native\Linux\LibC.cs" LinkBase="Native" />
+  </ItemGroup>
+
+</Project>

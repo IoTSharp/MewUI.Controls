@@ -1,5 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/MewUI.Backend.Framebuffer/MewUI.Backend.Framebuffer.csproj" />
     <Project Path="src/MewUI.Controls/MewUI.Controls.csproj" />
+    <Project Path="src/MewUI.Platform.Framebuffer/MewUI.Platform.Framebuffer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MewUI.Test/MewUI.Test.csproj" />
   </Folder>
 </Solution>
