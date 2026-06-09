@@ -38,6 +38,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\FontBase.cs" LinkBase="Rendering" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\TextLayoutUtils.cs" LinkBase="Rendering" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\TextMeasurePolicy.cs" LinkBase="Rendering" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\Surfaces\RenderSurfaceDefaults.cs" LinkBase="Rendering\Surfaces" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Resources\FontRegistry.cs" LinkBase="Resources" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Common\TextBitmap.cs" LinkBase="Rendering\Common" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\FreeType\**\*.cs" LinkBase="Rendering\FreeType" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Gdi\Sdf\*.cs" LinkBase="Rendering\Gdi\Sdf" />

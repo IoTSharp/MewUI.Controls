@@ -57,21 +57,14 @@ public sealed class FramebufferGraphicsFactory : IGraphicsFactory
         bool italic = false, bool underline = false, bool strikethrough = false)
     {
         string normalizedFamily = string.IsNullOrWhiteSpace(family) ? "sans-serif" : family;
-        try
+        string? path = LinuxFontResolver.ResolveFontPath(normalizedFamily, weight, italic);
+        if (string.IsNullOrWhiteSpace(path))
         {
-            string? path = LinuxFontResolver.ResolveFontPath(normalizedFamily, weight, italic);
-            int pixelHeight = Math.Max(1, (int)Math.Round(size * (dpi == 0 ? 96 : dpi) / 96.0));
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                return new FreeTypeFont(normalizedFamily, size, weight, italic, underline, strikethrough, path, pixelHeight);
-            }
-        }
-        catch
-        {
-            // Keep framebuffer usable on minimal systems without FreeType/fontconfig.
+            throw new InvalidOperationException($"Framebuffer backend could not resolve font '{normalizedFamily}'.");
         }
 
-        return new BasicFont(normalizedFamily, size, weight, italic, underline, strikethrough);
+        int pixelHeight = Math.Max(1, (int)Math.Round(size * (dpi == 0 ? 96 : dpi) / 96.0));
+        return new FreeTypeFont(normalizedFamily, size, weight, italic, underline, strikethrough, path, pixelHeight);
     }
 
     public IImage CreateImageFromFile(string path)
