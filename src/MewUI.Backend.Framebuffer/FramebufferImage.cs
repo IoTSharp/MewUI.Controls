@@ -6,16 +6,19 @@ internal sealed class FramebufferImage : IImage
 {
     private byte[]? _pixels;
 
-    private FramebufferImage(int pixelWidth, int pixelHeight, byte[] pixels)
+    private FramebufferImage(int pixelWidth, int pixelHeight, byte[] pixels, bool isOpaque)
     {
         PixelWidth = pixelWidth;
         PixelHeight = pixelHeight;
+        IsOpaque = isOpaque;
         _pixels = pixels;
     }
 
     public int PixelWidth { get; }
 
     public int PixelHeight { get; }
+
+    internal bool IsOpaque { get; }
 
     internal ReadOnlySpan<byte> Pixels => _pixels ?? throw new ObjectDisposedException(nameof(FramebufferImage));
 
@@ -64,8 +67,9 @@ internal sealed class FramebufferImage : IImage
             throw new ArgumentException("Invalid BGRA buffer length.", nameof(bgra));
         }
 
+        var isOpaque = IsFullyOpaque(bgra);
         var premul = GC.AllocateUninitializedArray<byte>(expected);
-        if (sourcePremultiplied)
+        if (sourcePremultiplied || isOpaque)
         {
             bgra.AsSpan().CopyTo(premul);
         }
@@ -81,11 +85,24 @@ internal sealed class FramebufferImage : IImage
             }
         }
 
-        return new FramebufferImage(width, height, premul);
+        return new FramebufferImage(width, height, premul, isOpaque);
     }
 
     private static byte Premultiply(byte c, byte a)
         => a == 255 ? c : (byte)((c * a + 127) / 255);
+
+    private static bool IsFullyOpaque(byte[] bgra)
+    {
+        for (int i = 3; i < bgra.Length; i += 4)
+        {
+            if (bgra[i] != 255)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private static void CopyRows(byte[] source, int sourceStride, byte[] destination, int destinationStride, int rowBytes, int height)
     {

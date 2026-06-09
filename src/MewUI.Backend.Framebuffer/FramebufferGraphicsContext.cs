@@ -328,6 +328,11 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
 
     private void DrawImageCore(FramebufferImage image, Rect destRect, Rect sourceRect)
     {
+        if (TryBlitOpaqueImage(image, destRect, sourceRect))
+        {
+            return;
+        }
+
         var fullDest = ToPixelBounds(destRect);
         var dest = fullDest.Intersect(_clip);
         if (dest.IsEmpty || fullDest.IsEmpty || destRect.Width == 0 || destRect.Height == 0)
@@ -358,6 +363,54 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
             }
         }
     }
+
+    private bool TryBlitOpaqueImage(FramebufferImage image, Rect destRect, Rect sourceRect)
+    {
+        if (!image.IsOpaque || _clipMask is not null || GlobalAlpha < 0.999f)
+        {
+            return false;
+        }
+
+        if (!IsWholeImageSource(image, sourceRect) ||
+            !TryGetAxisAlignedDeviceRect(destRect, out var deviceRect, out _, out _) ||
+            !IsInteger(deviceRect.X) ||
+            !IsInteger(deviceRect.Y) ||
+            !IsInteger(deviceRect.Width) ||
+            !IsInteger(deviceRect.Height) ||
+            (int)MathF.Round(deviceRect.Width) != image.PixelWidth ||
+            (int)MathF.Round(deviceRect.Height) != image.PixelHeight)
+        {
+            return false;
+        }
+
+        var fullDest = ToPixelBounds(deviceRect);
+        var dest = fullDest.Intersect(_clip);
+        if (dest.IsEmpty)
+        {
+            return true;
+        }
+
+        var source = image.Pixels;
+        int sourceX = dest.X - fullDest.X;
+        int sourceY = dest.Y - fullDest.Y;
+        int rowBytes = checked(dest.Width * 4);
+        for (int y = 0; y < dest.Height; y++)
+        {
+            source.Slice(((sourceY + y) * image.PixelWidth + sourceX) * 4, rowBytes)
+                .CopyTo(_pixels.AsSpan((dest.Y + y) * _surface.StrideBytes + dest.X * 4, rowBytes));
+        }
+
+        return true;
+    }
+
+    private static bool IsWholeImageSource(FramebufferImage image, Rect sourceRect)
+        => NearlyEqual((float)sourceRect.X, 0) &&
+           NearlyEqual((float)sourceRect.Y, 0) &&
+           NearlyEqual((float)sourceRect.Width, image.PixelWidth) &&
+           NearlyEqual((float)sourceRect.Height, image.PixelHeight);
+
+    private static bool IsInteger(float value)
+        => MathF.Abs(value - MathF.Round(value)) <= 0.001f;
 
     private void DrawTextRuns(ReadOnlySpan<char> text, Rect bounds, TextFormat format, TextLayout layout, Color color)
     {
