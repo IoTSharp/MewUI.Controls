@@ -31,4 +31,10 @@ public sealed record FramebufferOptions
     public int TouchMoveThrottleMs { get; init; } = 100;
 
     public bool PollTouchOnUiThread { get; init; }
+
+    public int TextCacheMaxEntries { get; init; } = 256;
+
+    public long TextCacheMaxBytes { get; init; } = 4 * 1024 * 1024;
+
+    public int TextCacheMaxAreaPixels { get; init; } = 512 * 128;
 }

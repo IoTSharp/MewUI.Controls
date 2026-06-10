@@ -1,6 +1,4 @@
 using System.Numerics;
-using System.Runtime.InteropServices;
-
 using Aprillz.MewUI.Rendering.Gdi.Rendering;
 using Aprillz.MewUI.Rendering.Gdi.Sdf;
 using Aprillz.MewUI.Rendering.FreeType;
@@ -10,6 +8,7 @@ namespace Aprillz.MewUI.Rendering.Framebuffer;
 internal sealed class FramebufferGraphicsContext : GraphicsContextBase
 {
     private readonly FramebufferRenderSurface _surface;
+    private readonly FramebufferGraphicsFactory _factory;
     private readonly Stack<State> _states = new();
     private byte[] _pixels = [];
     private Matrix3x2 _transform = Matrix3x2.Identity;
@@ -21,9 +20,10 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
     private float _globalAlpha = 1f;
     private bool _textPixelSnap = true;
 
-    public FramebufferGraphicsContext(FramebufferRenderSurface surface)
+    public FramebufferGraphicsContext(FramebufferRenderSurface surface, FramebufferGraphicsFactory factory)
     {
         _surface = surface;
+        _factory = factory;
     }
 
     public override double DpiScale => _surface.DpiScale;
@@ -70,18 +70,19 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
     public override void Clear(Color color)
     {
         var c = ToPremul(ApplyGlobalAlpha(color));
-        for (int y = 0; y < _surface.PixelHeight; y++)
-        {
-            int row = y * _surface.StrideBytes;
-            for (int x = 0; x < _surface.PixelWidth; x++)
-            {
-                int i = row + x * 4;
-                _pixels[i + 0] = c.B;
-                _pixels[i + 1] = c.G;
-                _pixels[i + 2] = c.R;
-                _pixels[i + 3] = c.A;
-            }
-        }
+        FramebufferPixelOperations.FillRectangleBgra32(
+            _pixels,
+            _surface.PixelWidth,
+            _surface.PixelHeight,
+            _surface.StrideBytes,
+            0,
+            0,
+            _surface.PixelWidth,
+            _surface.PixelHeight,
+            c.B,
+            c.G,
+            c.R,
+            c.A);
     }
 
     protected override void SaveCore()
@@ -328,7 +329,7 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
 
     private void DrawImageCore(FramebufferImage image, Rect destRect, Rect sourceRect)
     {
-        if (TryBlitOpaqueImage(image, destRect, sourceRect))
+        if (TryBlitWholeImage(image, destRect, sourceRect))
         {
             return;
         }
@@ -364,9 +365,9 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
         }
     }
 
-    private bool TryBlitOpaqueImage(FramebufferImage image, Rect destRect, Rect sourceRect)
+    private bool TryBlitWholeImage(FramebufferImage image, Rect destRect, Rect sourceRect)
     {
-        if (!image.IsOpaque || _clipMask is not null || GlobalAlpha < 0.999f)
+        if (_clipMask is not null || GlobalAlpha < 0.999f)
         {
             return false;
         }
@@ -390,14 +391,32 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
             return true;
         }
 
-        var source = image.Pixels;
         int sourceX = dest.X - fullDest.X;
         int sourceY = dest.Y - fullDest.Y;
-        int rowBytes = checked(dest.Width * 4);
-        for (int y = 0; y < dest.Height; y++)
+
+        if (image.IsOpaque)
         {
-            source.Slice(((sourceY + y) * image.PixelWidth + sourceX) * 4, rowBytes)
-                .CopyTo(_pixels.AsSpan((dest.Y + y) * _surface.StrideBytes + dest.X * 4, rowBytes));
+            FramebufferPixelOperations.CopyRows(
+                image.Pixels.Slice((sourceY * image.PixelWidth + sourceX) * 4),
+                image.PixelWidth * 4,
+                _pixels.AsSpan(dest.Y * _surface.StrideBytes + dest.X * 4),
+                _surface.StrideBytes,
+                checked(dest.Width * 4),
+                dest.Height);
+        }
+        else
+        {
+            FramebufferPixelOperations.BlendPremultipliedRegion(
+                image.Pixels,
+                image.PixelWidth * 4,
+                sourceX,
+                sourceY,
+                _pixels,
+                _surface.StrideBytes,
+                dest.X,
+                dest.Y,
+                dest.Width,
+                dest.Height);
         }
 
         return true;
@@ -450,6 +469,41 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
             bounds = new Rect(bounds.X, bounds.Y, widthPx / scale, heightPx / scale);
         }
 
+        var textValue = text.ToString();
+        var key = FramebufferTextCacheKey.Create(
+            textValue,
+            font,
+            color,
+            widthPx,
+            heightPx,
+            format.HorizontalAlignment,
+            format.VerticalAlignment,
+            format.Wrapping,
+            format.Trimming);
+
+        if (!_factory.TextCache.TryGetOrCreate(
+            key,
+            _factory.Options.TextCacheMaxEntries,
+            _factory.Options.TextCacheMaxBytes,
+            _factory.Options.TextCacheMaxAreaPixels,
+            () => CreateCachedTextBitmap(textValue, font, widthPx, heightPx, color, format),
+            out var cached))
+        {
+            cached = CreateCachedTextBitmap(textValue, font, widthPx, heightPx, color, format);
+        }
+
+        using var image = FramebufferImage.FromPremultipliedBgraNoCopy(cached.WidthPx, cached.HeightPx, cached.PremultipliedPixels, isOpaque: false);
+        DrawImageCore(image, bounds, new Rect(0, 0, cached.WidthPx, cached.HeightPx));
+    }
+
+    private static FramebufferCachedTextBitmap CreateCachedTextBitmap(
+        ReadOnlySpan<char> text,
+        FreeTypeFont font,
+        int widthPx,
+        int heightPx,
+        Color color,
+        TextFormat format)
+    {
         var bitmap = FreeTypeText.Rasterize(
             text,
             font,
@@ -461,8 +515,10 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
             format.Wrapping,
             format.Trimming);
 
-        using var image = FramebufferImage.FromBgra(bitmap.WidthPx, bitmap.HeightPx, bitmap.Data, sourcePremultiplied: false);
-        DrawImageCore(image, bounds, new Rect(0, 0, bitmap.WidthPx, bitmap.HeightPx));
+        return new FramebufferCachedTextBitmap(
+            bitmap.WidthPx,
+            bitmap.HeightPx,
+            FramebufferPixelOperations.ToPremultipliedBgra32(bitmap.Data, sourcePremultiplied: false));
     }
 
     private void FillGradient(Rect rect, ILinearGradientBrush brush)
@@ -549,13 +605,19 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
         var premul = ToPremul(color);
         if (_clipMask is null && premul.A == 255)
         {
-            uint packed = (uint)(premul.B | (premul.G << 8) | (premul.R << 16) | (premul.A << 24));
-            for (int y = bounds.Y; y < bounds.Bottom; y++)
-            {
-                var row = _pixels.AsSpan(y * _surface.StrideBytes + bounds.X * 4, bounds.Width * 4);
-                MemoryMarshal.Cast<byte, uint>(row).Fill(packed);
-            }
-
+            FramebufferPixelOperations.FillRectangleBgra32(
+                _pixels,
+                _surface.PixelWidth,
+                _surface.PixelHeight,
+                _surface.StrideBytes,
+                bounds.X,
+                bounds.Y,
+                bounds.Width,
+                bounds.Height,
+                premul.B,
+                premul.G,
+                premul.R,
+                premul.A);
             return true;
         }
 
@@ -587,20 +649,7 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
                     }
                 }
 
-                if (sa == 255)
-                {
-                    _pixels[pixel + 0] = sb;
-                    _pixels[pixel + 1] = sg;
-                    _pixels[pixel + 2] = sr;
-                    _pixels[pixel + 3] = 255;
-                    continue;
-                }
-
-                int inv = 255 - sa;
-                _pixels[pixel + 0] = (byte)(sb + (_pixels[pixel + 0] * inv + 127) / 255);
-                _pixels[pixel + 1] = (byte)(sg + (_pixels[pixel + 1] * inv + 127) / 255);
-                _pixels[pixel + 2] = (byte)(sr + (_pixels[pixel + 2] * inv + 127) / 255);
-                _pixels[pixel + 3] = (byte)(sa + (_pixels[pixel + 3] * inv + 127) / 255);
+                FramebufferPixelOperations.BlendPremultipliedPixel(_pixels, pixel, sb, sg, sr, sa);
             }
         }
 
@@ -1153,21 +1202,7 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
             }
         }
 
-        int i = y * _surface.StrideBytes + x * 4;
-        if (sa == 255)
-        {
-            _pixels[i + 0] = sb;
-            _pixels[i + 1] = sg;
-            _pixels[i + 2] = sr;
-            _pixels[i + 3] = 255;
-            return;
-        }
-
-        int inv = 255 - sa;
-        _pixels[i + 0] = (byte)(sb + (_pixels[i + 0] * inv + 127) / 255);
-        _pixels[i + 1] = (byte)(sg + (_pixels[i + 1] * inv + 127) / 255);
-        _pixels[i + 2] = (byte)(sr + (_pixels[i + 2] * inv + 127) / 255);
-        _pixels[i + 3] = (byte)(sa + (_pixels[i + 3] * inv + 127) / 255);
+        FramebufferPixelOperations.BlendPremultipliedPixel(_pixels, y * _surface.StrideBytes + x * 4, sb, sg, sr, sa);
     }
 
     private Color ApplyGlobalAlpha(Color color)

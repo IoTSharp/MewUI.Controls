@@ -11,6 +11,7 @@ public sealed class FramebufferGraphicsFactory : IGraphicsFactory
     private static readonly object Sync = new();
 
     private LinuxFramebuffer? _framebuffer;
+    private readonly FramebufferTextCache _textCache = new();
 
     private FramebufferGraphicsFactory()
     {
@@ -26,6 +27,8 @@ public sealed class FramebufferGraphicsFactory : IGraphicsFactory
 
     public FramebufferOptions Options { get; private set; } = new();
 
+    internal FramebufferTextCache TextCache => _textCache;
+
     public void Configure(FramebufferOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -38,6 +41,7 @@ public sealed class FramebufferGraphicsFactory : IGraphicsFactory
             }
 
             Options = options;
+            _textCache.Clear();
         }
     }
 
@@ -98,7 +102,7 @@ public sealed class FramebufferGraphicsFactory : IGraphicsFactory
             throw new ArgumentException("Surface was not created by the framebuffer backend.", nameof(surface));
         }
 
-        return new FramebufferGraphicsContext(framebufferSurface);
+        return new FramebufferGraphicsContext(framebufferSurface, this);
     }
 
     public IImage CreateImageView(IRenderSurface surface)
@@ -151,6 +155,7 @@ public sealed class FramebufferGraphicsFactory : IGraphicsFactory
         {
             _framebuffer?.Dispose();
             _framebuffer = null;
+            _textCache.Clear();
         }
     }
 }
