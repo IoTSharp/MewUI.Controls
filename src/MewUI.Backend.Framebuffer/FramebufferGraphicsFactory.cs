@@ -45,6 +45,13 @@ public sealed class FramebufferGraphicsFactory : IGraphicsFactory
         }
     }
 
+    public void TrimTransientCaches()
+    {
+        var options = Options;
+        _textCache.Trim(options.TextCacheMaxEntries, options.TextCacheMaxBytes);
+        FreeTypeFaceCache.Instance.Trim(options.FontFaceCacheMaxEntries);
+    }
+
     public LinuxFramebuffer GetOrOpenFramebuffer()
     {
         lock (Sync)

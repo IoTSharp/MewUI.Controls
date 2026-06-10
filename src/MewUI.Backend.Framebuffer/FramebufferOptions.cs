@@ -32,9 +32,15 @@ public sealed record FramebufferOptions
 
     public bool PollTouchOnUiThread { get; init; }
 
-    public int TextCacheMaxEntries { get; init; } = 256;
+    public int TextCacheMaxEntries { get; init; } = 32;
 
-    public long TextCacheMaxBytes { get; init; } = 4 * 1024 * 1024;
+    public long TextCacheMaxBytes { get; init; } = 512 * 1024;
 
-    public int TextCacheMaxAreaPixels { get; init; } = 512 * 128;
+    public int TextCacheMaxAreaPixels { get; init; } = 256 * 96;
+
+    public int RegionSurfaceCacheMaxEntries { get; init; } = 2;
+
+    public long RegionSurfaceCacheMaxBytes { get; init; } = 768 * 1024;
+
+    public int FontFaceCacheMaxEntries { get; init; } = 16;
 }

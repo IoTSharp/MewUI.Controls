@@ -57,7 +57,7 @@ internal sealed class FramebufferTextCache
             _lru.AddFirst(node);
             _map.Add(key, node);
             _bytes += bytes;
-            Trim(maxEntries, maxBytes);
+            TrimCore(maxEntries, maxBytes);
         }
 
         bitmap = created;
@@ -74,7 +74,25 @@ internal sealed class FramebufferTextCache
         }
     }
 
-    private void Trim(int maxEntries, long maxBytes)
+    public void Trim(int maxEntries, long maxBytes)
+    {
+        if (maxEntries < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxEntries));
+        }
+
+        if (maxBytes < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxBytes));
+        }
+
+        lock (_syncRoot)
+        {
+            TrimCore(maxEntries, maxBytes);
+        }
+    }
+
+    private void TrimCore(int maxEntries, long maxBytes)
     {
         while ((_map.Count > maxEntries || _bytes > maxBytes) && _lru.Last is { } node)
         {

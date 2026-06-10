@@ -100,6 +100,20 @@ public sealed class FramebufferPixelOperationsTests
         AssertPixel(frame.Data, 4, 2, 2, b: 0, g: 0, r: 255, a: 255);
     }
 
+    [TestMethod]
+    public void FrameComposer_LimitsCachedRegionSurfaces()
+    {
+        var factory = FramebufferGraphicsFactory.Instance;
+        using var composer = new FramebufferFrameComposer(factory);
+        var frame = new Bgra32PixelBuffer(8, 8, new byte[8 * 8 * 4]);
+
+        composer.TryRenderRegionOnto(frame, 0, 0, 2, 2, context => context.Clear(Color.Transparent));
+        composer.TryRenderRegionOnto(frame, 0, 0, 3, 2, context => context.Clear(Color.Transparent));
+        composer.TryRenderRegionOnto(frame, 0, 0, 4, 2, context => context.Clear(Color.Transparent));
+
+        Assert.IsLessThanOrEqualTo(2, composer.CachedSurfaceCount);
+    }
+
     private static void AssertPixel(byte[] pixels, int width, int x, int y, byte b, byte g, byte r, byte a, byte tolerance = 0)
     {
         int offset = (y * width + x) * 4;
