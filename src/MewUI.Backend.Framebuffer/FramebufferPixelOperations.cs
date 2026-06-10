@@ -56,14 +56,28 @@ public static class FramebufferPixelOperations
         ArgumentNullException.ThrowIfNull(surface);
 
         var destination = GC.AllocateUninitializedArray<byte>(checked(surface.PixelWidth * surface.PixelHeight * Bgra32BytesPerPixel));
+        CopySurfacePixels(surface, destination);
+        return destination;
+    }
+
+    public static void CopySurfacePixels(ICpuPixelSurface surface, Span<byte> destination)
+    {
+        ArgumentNullException.ThrowIfNull(surface);
+
+        int rowBytes = checked(surface.PixelWidth * Bgra32BytesPerPixel);
+        int required = checked((surface.PixelHeight - 1) * rowBytes + rowBytes);
+        if (destination.Length < required)
+        {
+            throw new ArgumentException("Destination buffer is too small for the supplied surface.", nameof(destination));
+        }
+
         CopyRows(
             surface.GetReadOnlyPixelSpan(),
             surface.StrideBytes,
             destination,
-            surface.PixelWidth * Bgra32BytesPerPixel,
-            surface.PixelWidth * Bgra32BytesPerPixel,
+            rowBytes,
+            rowBytes,
             surface.PixelHeight);
-        return destination;
     }
 
     public static void FillRectangleBgra32(
