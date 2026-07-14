@@ -58,6 +58,16 @@ public interface ITerminalHostCapabilities
 }
 
 /// <summary>
+/// Host-provided clipboard bridge for terminal copy and paste.
+/// </summary>
+public interface ITerminalClipboard
+{
+    string GetText();
+
+    void SetText(string text);
+}
+
+/// <summary>
 /// Optional host capability for clearing a host-owned terminal buffer.
 /// </summary>
 public interface ITerminalScreenClearer

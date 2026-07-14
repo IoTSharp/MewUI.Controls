@@ -1,7 +1,7 @@
 # MewUI.Controls
 
 Third-party controls and higher-level interaction surfaces for
-[MewUI](https://github.com/IoTSharp/MewUI).
+[MewUI](https://github.com/aprillz/MewUI).
 
 The public namespace is `IoTSharp.MewUI.Controls`.
 

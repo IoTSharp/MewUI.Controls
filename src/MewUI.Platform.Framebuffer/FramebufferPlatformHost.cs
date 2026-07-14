@@ -6,7 +6,7 @@ using Aprillz.MewUI.Rendering.Framebuffer;
 
 namespace Aprillz.MewUI.Platform.Framebuffer;
 
-public sealed class FramebufferPlatformHost : IPlatformHost
+internal sealed class FramebufferPlatformHost : IPlatformHost
 {
     private readonly List<FramebufferWindowBackend> _windows = new();
     private bool _running;

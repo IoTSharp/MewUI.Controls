@@ -66,6 +66,11 @@ public sealed class VncRemoteDesktopControl : Control, ITextInputClient
     private VncConnectionState _connectionState = VncConnectionState.Disconnected;
     private string _statusText = "VNC framebuffer";
 
+    static VncRemoteDesktopControl()
+    {
+        FocusableProperty.OverrideDefaultValue<VncRemoteDesktopControl>(true);
+    }
+
     public VncRemoteDesktopControl()
     {
         Background = Color.FromRgb(18, 20, 24);
@@ -74,8 +79,6 @@ public sealed class VncRemoteDesktopControl : Control, ITextInputClient
         Cursor = CursorType.Arrow;
         FocusableOnPointerInput = true;
     }
-
-    public override bool Focusable => true;
 
     public bool FocusableOnPointerInput { get; set; }
 

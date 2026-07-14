@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\..\MewUI\src\MewUI\MewUI.csproj')">
-    <PackageReference Include="Aprillz.MewUI.Core" Version="0.15.2" />
+    <PackageReference Include="Aprillz.MewUI.Core" Version="0.19.1" />
   </ItemGroup>
 
 </Project>

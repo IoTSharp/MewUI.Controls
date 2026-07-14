@@ -10,7 +10,7 @@ public static class FramebufferBackend
     public const string BackendIdentifier = FramebufferGraphicsFactory.BackendIdentifier;
 
     public static void Register()
-        => Application.RegisterGraphicsFactory(BackendIdentifier, static () => FramebufferGraphicsFactory.Instance);
+        => Application.RegisterGraphicsFactory(static () => FramebufferGraphicsFactory.Instance);
 
     public static ApplicationBuilder UseFramebufferBackend(this ApplicationBuilder builder)
     {

@@ -41,6 +41,4 @@ public sealed record FramebufferOptions
     public int RegionSurfaceCacheMaxEntries { get; init; } = 2;
 
     public long RegionSurfaceCacheMaxBytes { get; init; } = 768 * 1024;
-
-    public int FontFaceCacheMaxEntries { get; init; } = 16;
 }

@@ -4,7 +4,7 @@
 
   <PropertyGroup Condition="'$(MewUITitle)' == ''">
     <MewUITitle>Aprillz.MewUI</MewUITitle>
-    <MewUIVersion>0.16.0</MewUIVersion>
+    <MewUIVersion>0.19.1</MewUIVersion>
     <MewUIAuthor>Aprillz</MewUIAuthor>
     <MewUIRootNamespace>Aprillz.MewUI</MewUIRootNamespace>
     <MewUITargetFrameworks>net8.0;net10.0</MewUITargetFrameworks>
@@ -38,11 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\FontBase.cs" LinkBase="Rendering" />
-    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\TextLayoutUtils.cs" LinkBase="Rendering" />
-    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\TextMeasurePolicy.cs" LinkBase="Rendering" />
-    <Compile Include="..\..\..\MewUI\src\MewUI\Rendering\Surfaces\RenderSurfaceDefaults.cs" LinkBase="Rendering\Surfaces" />
-    <Compile Include="..\..\..\MewUI\src\MewUI\Resources\FontRegistry.cs" LinkBase="Resources" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Common\TextBitmap.cs" LinkBase="Rendering\Common" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\FreeType\**\*.cs" LinkBase="Rendering\FreeType" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Rendering\Gdi\Sdf\*.cs" LinkBase="Rendering\Gdi\Sdf" />

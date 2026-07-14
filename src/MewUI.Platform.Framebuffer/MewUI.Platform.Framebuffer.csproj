@@ -4,7 +4,7 @@
 
   <PropertyGroup Condition="'$(MewUITitle)' == ''">
     <MewUITitle>Aprillz.MewUI</MewUITitle>
-    <MewUIVersion>0.16.0</MewUIVersion>
+    <MewUIVersion>0.19.1</MewUIVersion>
     <MewUIAuthor>Aprillz</MewUIAuthor>
     <MewUIRootNamespace>Aprillz.MewUI</MewUIRootNamespace>
     <MewUITargetFrameworks>net8.0;net10.0</MewUITargetFrameworks>
@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxDispatcher.cs" LinkBase="Platform\Linux" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxExternalDialogs.cs" LinkBase="Platform\Linux" />
+    <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\NativeDialogHelper.cs" LinkBase="Platform\Linux" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxThemeDetector.cs" LinkBase="Platform\Linux" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Platform\Linux\LinuxGSettingsMonitor.cs" LinkBase="Platform\Linux" />
     <Compile Include="..\..\..\MewUI\src\MewUI\Shared\Native\Linux\LibC.cs" LinkBase="Native" />

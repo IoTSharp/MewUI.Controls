@@ -65,6 +65,11 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
     private bool _cursorVisible = true;
     private bool _isComposing;
 
+    static TerminalControl()
+    {
+        FocusableProperty.OverrideDefaultValue<TerminalControl>(true);
+    }
+
     public TerminalControl()
     {
         FontFamily = "Consolas";
@@ -79,8 +84,6 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
         ContextMenu = CreateContextMenu();
     }
 
-    public override bool Focusable => true;
-
     public int Columns => _screenSource?.Columns ?? _columns;
 
     public int Rows => _screenSource?.Rows ?? _rows;
@@ -90,6 +93,8 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
     public ITerminalHost? Host => _host;
 
     public ITerminalScreenSource? ScreenSource => _screenSource;
+
+    public ITerminalClipboard? Clipboard { get; set; }
 
     public int ScrollbackLimit
     {
@@ -238,17 +243,19 @@ public sealed class TerminalControl : Control, ITextInputClient, ITextCompositio
     public bool CopySelectionToClipboard()
     {
         var selected = GetSelectedText();
-        if (selected.Length == 0 || !Application.IsRunning)
+        if (selected.Length == 0 || Clipboard == null)
         {
             return false;
         }
 
-        return Application.Current.PlatformHost.Clipboard.TrySetText(selected);
+        Clipboard.SetText(selected);
+        return true;
     }
 
     public bool PasteFromClipboard()
     {
-        if (!Application.IsRunning || !Application.Current.PlatformHost.Clipboard.TryGetText(out var text) || string.IsNullOrEmpty(text))
+        string? text = Clipboard?.GetText();
+        if (string.IsNullOrEmpty(text))
         {
             return false;
         }

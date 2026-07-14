@@ -10,7 +10,7 @@ public static class FramebufferPlatform
     public const string PlatformId = "framebuffer";
 
     public static void Register()
-        => Application.RegisterPlatformHost(PlatformId, static () => new FramebufferPlatformHost());
+        => Application.RegisterPlatformHost(static () => new FramebufferPlatformHost());
 
     public static ApplicationBuilder UseFramebuffer(this ApplicationBuilder builder)
     {

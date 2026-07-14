@@ -253,15 +253,15 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
         FillContours(contours, ApplyGlobalAlpha(color), fillRule);
     }
 
-    public override void FillRectangle(Rect rect, IBrush brush)
+    public override void FillRectangle(Rect rect, Brush brush)
     {
-        if (brush is ILinearGradientBrush linear)
+        if (brush is LinearGradientBrush linear)
         {
             FillGradient(rect, linear);
             return;
         }
 
-        if (brush is IRadialGradientBrush radial)
+        if (brush is RadialGradientBrush radial)
         {
             FillGradient(rect, radial);
             return;
@@ -521,7 +521,7 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
             FramebufferPixelOperations.ToPremultipliedBgra32(bitmap.Data, sourcePremultiplied: false));
     }
 
-    private void FillGradient(Rect rect, ILinearGradientBrush brush)
+    private void FillGradient(Rect rect, LinearGradientBrush brush)
     {
         var bounds = ToPixelBounds(rect).Intersect(_clip);
         if (bounds.IsEmpty || brush.Stops.Count == 0)
@@ -550,7 +550,7 @@ internal sealed class FramebufferGraphicsContext : GraphicsContextBase
         }
     }
 
-    private void FillGradient(Rect rect, IRadialGradientBrush brush)
+    private void FillGradient(Rect rect, RadialGradientBrush brush)
     {
         var bounds = ToPixelBounds(rect).Intersect(_clip);
         if (bounds.IsEmpty || brush.Stops.Count == 0)
